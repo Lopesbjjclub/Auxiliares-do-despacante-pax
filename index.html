@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="application/pdf">
+    <title>Regras Grupo Auxiliares do Despachante Pax</title>
+    <link rel="shortcut icon" href="img/can_01.gif" type="image/x-icon">
+    <meta name="theme-color" content="#2196F3">
+       
+    <meta property="og:title" content="Regras do Grupo dos Auxiliares do Despachante Pax ">
+    <meta property="og:description" content="Com objetivo de divulgar as regras do grupo dos auxiliares do despachante pax">
+    <meta property="og:image" content="https://regrasauxiliarespax.netlify.app/img/can_01.gif">
+    <meta property="og:image:width" content="650">
+    <meta property="og:image:height" content="1200">
+    <meta property="og:image:type" content="img/can_01.gif">
+    <meta property="og:url" content="https://regrasauxiliarespax.netlify.app/">
+    <meta property="og:type" content="website">
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: calc(1.5em + 1vw);
+            transition: font-size 0.3s ease;
+        }
+
+        #pdf-viewer {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        #pdf-container {
+            width: 100%;
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            overflow: auto;
+            text-align: center;
+        }
+
+        #pdf-canvas {
+            margin: 0 auto;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .navigation-buttons {
+            text-align: center;
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        button, .download-button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.2s ease;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        button {
+            background-color: #4CAF50;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .download-button {
+            background-color: #007bff;
+            margin-top: 15px;
+        }
+
+        .download-button:hover {
+            background-color: #0056b3;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+                margin-bottom: 20px;
+            }
+
+            #pdf-viewer {
+                padding: 15px;
+            }
+
+            button {
+                padding: 8px 16px;
+                margin: 5px;
+                font-size: 14px;
+                width: 90%;
+            }
+
+             .download-button {
+                padding: 8px 16px;
+                margin: 5px;
+                font-size: 14px;
+                width: 50%;
+                
+            }
+
+            .navigation-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            #pageNum {
+                display: block;
+                margin: 10px 0;
+            }
+
+            footer {
+                font-size: 0.8em;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Regras do Grupo dos Auxiliares do Despachante Pax</h1>
+    
+    <div id="pdf-viewer">
+        <div id="pdf-container">
+            <canvas id="pdf-canvas"></canvas>
+        </div>
+        
+        <div class="navigation-buttons">
+            <button id="prevPage" onclick="changePage(-1)" disabled>Anterior</button>
+            <span id="pageNum">Página 1</span>
+            <button id="nextPage" onclick="changePage(1)">Próxima</button>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="pdf/Regras_do_grupo_de_auxiliares_do_pax_assinado.pdf" download class="download-button">Baixar PDF Completo</a>
+        </div>
+    </div>
+
+    <footer>
+        Todos os direitos reservados a DevLopes 2025
+    </footer>
+
+    <script>
+        const url = 'pdf/Regras_do_grupo_de_auxiliares_do_pax_assinado.pdf';
+        let pdfDoc = null,
+            currentPage = 1,
+            totalPages = 1,
+            pageRendering = false;
+
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js';
+
+        function renderPage(num) {
+            pageRendering = true;
+            pdfDoc.getPage(num).then((page) => {
+                const canvas = document.getElementById('pdf-canvas');
+                const ctx = canvas.getContext('2d');
+                const viewport = page.getViewport({ scale: 1.5 });
+                
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                
+                const renderCtx = {
+                    canvasContext: ctx,
+                    viewport: viewport
+                };
+                
+                page.render(renderCtx).promise.then(() => {
+                    pageRendering = false;
+                    updatePageCounter();
+                });
+            });
+        }
+
+        function updatePageCounter() {
+            document.getElementById('pageNum').textContent = 
+                `Página ${currentPage} de ${totalPages}`;
+            document.getElementById('prevPage').disabled = currentPage <= 1;
+            document.getElementById('nextPage').disabled = currentPage >= totalPages;
+        }
+
+        function changePage(offset) {
+            if (pageRendering) return;
+            const newPage = currentPage + offset;
+            if (newPage < 1 || newPage > totalPages) return;
+            
+            currentPage = newPage;
+            renderPage(currentPage);
+        }
+
+        pdfjsLib.getDocument(url).promise.then((pdfDoc_) => {
+            pdfDoc = pdfDoc_;
+            totalPages = pdfDoc.numPages;
+            renderPage(currentPage);
+        }).catch(error => {
+            console.error('Erro ao carregar PDF:', error);
+            alert('Erro ao carregar o PDF. Verifique o console para mais detalhes.');
+        });
+
+        // Redimensionamento responsivo
+        window.addEventListener('resize', () => {
+            if (!pageRendering && pdfDoc) {
+                renderPage(currentPage);
+            }
+        });
+    </script>
+</body>
+</html>
